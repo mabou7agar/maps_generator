@@ -10,6 +10,8 @@ class Line extends Model
 {
     use HasFactory;
 
+    const ERROR_MESSAGE = 'Line not exist';
+
     protected $guarded = [];
 
     public function routes(): HasMany

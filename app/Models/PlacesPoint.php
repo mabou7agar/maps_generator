@@ -9,4 +9,5 @@ class PlacesPoint extends Model
 {
     use HasFactory;
     protected $guarded = [];
+    const ERROR_MESSAGE = 'Place Not Exist';
 }

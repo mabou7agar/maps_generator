@@ -72,19 +72,21 @@ class AlRashidController extends Controller
     //---------------------------------------------------------------------
     public function getRoutes(Request $request)
     {
-        $fromId = $request->get('from_id', 7);
-        $toId = $request->get('to_id', 6);
+        $fromId = $request->get('from_id', 0);
+        $toId = $request->get('to_id', 0);
         if($fromId ==0 || $toId == 0)
         {
             return RoutePointResource::collection([]);
         }
-        $placeStart = PlacesPoint::where('id', $fromId)->first();
-        $placeEnd = PlacesPoint::where('id', $toId)->first();
+        $placeStart = PlacesPoint::where('id', $fromId)->firstOrFail();
+        $placeEnd = PlacesPoint::where('id', $toId)->firstOrFail();
         $points = [];
         $lines = Line::where('floor', $placeStart->floor)->where('is_intersection', 0)->get();
 
         $nearestLine1 = $this->getNearestLine($lines, $placeStart);
         $nearestLine2 = $this->getNearestLine($lines, $placeEnd);
+        if(!isset($nearestLine1->id) || !isset($nearestLine2->id))
+            return [];
         $IntersectionPoints = [];
         if ($nearestLine1->id != $nearestLine2->id) {
             $availableIntersectionsIds = $this->getAvailableIntersectionIds($nearestLine1->id, $nearestLine2->id);
