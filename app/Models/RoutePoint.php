@@ -10,4 +10,8 @@ class RoutePoint extends Model
     use HasFactory;
     protected $guarded = [];
     const ERROR_MESSAGE = 'Route not exist';
+
+    public function line(){
+        return$this->belongsTo(Line::class);
+    }
 }

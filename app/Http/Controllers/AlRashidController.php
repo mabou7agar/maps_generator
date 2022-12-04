@@ -74,9 +74,13 @@ class AlRashidController extends Controller
     {
         $fromId = $request->get('from_id', 0);
         $toId = $request->get('to_id', 0);
-        if($fromId ==0 || $toId == 0)
-        {
-            return RoutePointResource::collection([]);
+        $floor = $request->get('floor', 0);
+        if ($fromId == 0 || $toId == 0) {
+            return RoutePointResource::collection(
+                RoutePoint::whereHas('line', function ($q) use ($floor) {
+                    $q->where('floor', $floor);
+                })->get()
+            );
         }
         $placeStart = PlacesPoint::where('id', $fromId)->firstOrFail();
         $placeEnd = PlacesPoint::where('id', $toId)->firstOrFail();
@@ -85,8 +89,10 @@ class AlRashidController extends Controller
 
         $nearestLine1 = $this->getNearestLine($lines, $placeStart);
         $nearestLine2 = $this->getNearestLine($lines, $placeEnd);
-        if(!isset($nearestLine1->id) || !isset($nearestLine2->id))
+
+        if (!isset($nearestLine1->id) || !isset($nearestLine2->id)) {
             return [];
+        }
         $IntersectionPoints = [];
         if ($nearestLine1->id != $nearestLine2->id) {
             $availableIntersectionsIds = $this->getAvailableIntersectionIds($nearestLine1->id, $nearestLine2->id);
@@ -211,6 +217,7 @@ class AlRashidController extends Controller
     {
         $floor = $request->get('floor', 1);
         $this->generateIntersectionLines($floor);
+
         return PlacesPointResource::collection(PlacesPoint::where('floor', $floor)->get());
     }
 
